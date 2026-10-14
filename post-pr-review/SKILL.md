@@ -50,6 +50,7 @@ gh pr view <pr_number> --json number,headRefOid,files > "<スクラッチパッ�
 ```
 
 - **1 行目**: 重要度（`must` / `should` / `nit`）｜種別（`修正依頼` / `要議論`）、結論 1 文。1 行目だけで何の指摘か分かるようにする
+- **nit は投稿しない。** ユーザーが投稿すると言ったものだけ投稿する
 - **根拠**: 見出し・表を使わない
 - **提案**: 1 行で直せるものは ```` ```suggestion ```` ブロックにしてよい（インラインのときだけ効く）
 - **resolve の条件**: 満たしたかを判断できる形で書く
@@ -63,7 +64,7 @@ gh pr view <pr_number> --json number,headRefOid,files > "<スクラッチパッ�
 
 ```
 1. should｜修正依頼  inline  src/worker/job.py:42        エラー時に、何が失敗したかがログから読み取れない
-2. nit｜修正依頼     file    src/config/settings.py:39   設定キーを列挙型で限定する
+2. should｜修正依頼  file    src/config/settings.py:39   未設定のとき黙って既定値で動き、設定漏れに気づけない
 3. should｜要議論    comment PR 全体                     追加したテストの実行経路が無い
 ```
 
