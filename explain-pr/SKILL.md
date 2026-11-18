@@ -1,6 +1,6 @@
 ---
 name: explain-pr
-description: GitHub の PR を受け取り、変更箇所が属する大元の機能から説明し、背景を踏まえて何がどう変わったかを解説した上で、PR 説明にない観点を含めたコードレビューと「見るべきポイント」を出す。「この PR を解説して」「PR をレビューして」「#123 を説明して」「/explain-pr <URL>」で使う。GitHub には書き込まない。
+description: GitHub の PR を受け取り、変更箇所が属する大元の機能から説明し、背景を踏まえて何がどう変わったかを解説した上で、親 Issue の方針の評価と、PR 説明にない観点を含めたコードレビューと「見るべきポイント」を出す。「この PR を解説して」「PR をレビューして」「#123 を説明して」「/explain-pr <URL>」で使う。GitHub には書き込まない。
 argument-hint: "<PR URL | owner/repo#N>"
 ---
 
@@ -46,6 +46,21 @@ bash ~/.claude/skills/explain-pr/scripts/fetch_pr.sh <PR URL>
 `issue-N.json`（紐づく Issue）、`base/`（変更ファイルの base 側全文）、`history/`（変更ファイルの直近コミット）。
 
 サンドボックスで `gh` のネットワークが落ちたら、その旨を伝えて止まる。推測で埋めない。
+
+### Step 1.5: 親 Issue の方針レビューをサブエージェントに任せる
+
+材料が揃ったら、`review-issue-approach` を Agent ツールのサブエージェント（`general-purpose`、`run_in_background: true`）で起動し、待たずに Step 2 へ進む。
+方針の評価を差分のレビューと別の文脈で行うため、自分では実行しない。
+
+プロンプト:
+
+```
+~/.claude/skills/review-issue-approach/SKILL.md を読み、その手順で <PR URL> の親 Issue の方針をレビューせよ。
+材料は <Step 1 の出力先ディレクトリ> に集めてあるので fetch_pr.sh は再実行しない。
+SKILL.md の出力形式どおりの報告だけを返す。GitHub には書き込まない。
+```
+
+結果は出力の「親 Issue の方針」に使う。出力を書く前に完了通知を待つ。
 
 ### Step 2: 大元の機能を把握する（差分より先に読む）
 
@@ -151,6 +166,10 @@ PR 全体を `low` / `medium` / `high` の 3 段階で判定する。low-risk ch
 
 ## 変更の背景
 （Issue・PR 説明・コミット・履歴から。事実と推測を区別）
+
+## 親 Issue の方針
+（Step 1.5 のサブエージェントの報告から「複雑さ」「複雑さの値打ち」「提言」を載せる。
+親 Issue が見つからない・候補が複数で決まらないと報告されたら、その旨を 1 行で書く）
 
 ## 何がどう変わったか
 ### <ファイル or 関数>
